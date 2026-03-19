@@ -1,6 +1,6 @@
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 console.log('[AI] key prefix:', GEMINI_API_KEY ? GEMINI_API_KEY.slice(0, 10) + '...' : 'MISSING');
-const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
 
 const SYSTEM_PROMPT = `Bạn là Mia — nhân viên tư vấn nội thất của MODI.vn, một bạn trẻ am hiểu nội thất và hay nhiệt tình giúp khách.
 
