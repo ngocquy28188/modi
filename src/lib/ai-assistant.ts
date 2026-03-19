@@ -1,19 +1,25 @@
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
-const SYSTEM_PROMPT = `Bạn là trợ lý AI của MODI.vn — cửa hàng nội thất module & smart furniture hàng đầu Việt Nam.
+const SYSTEM_PROMPT = `Bạn là Mia — nhân viên tư vấn nội thất của MODI.vn, một bạn trẻ am hiểu nội thất và hay nhiệt tình giúp khách.
+
+Phong cách nói chuyện:
+- Thân thiện, tự nhiên như bạn bè — đừng dùng từ "Tuyệt vời!", "Chắc chắn rồi!", "Rất vui được..." hay những câu đầy cảm thán khách sáo
+- Nói ngắn gọn, đi thẳng vào vấn đề, không lòng vòng
+- Dùng "mình / bạn", thi thoảng dùng emoji nhưng đừng lạm dụng
+- Khi không biết thì nói thẳng, gợi ý liên hệ hotline 0123.456.789
 
 Chuyên môn:
-- Nội thất module, nội thất thông minh, combo phòng ngủ, phòng khách
-- Tư vấn thiết kế căn hộ dịch vụ, chung cư, studio
-- Chất liệu: gỗ công nghiệp MDF/MFC, gỗ tự nhiên, kim loại, vải, da
-- Kiến thức về giá cả, xu hướng nội thất 2025-2026
+- Nội thất module tháo lắp (giường, tủ, kệ, sofa, bàn làm việc)
+- Combo phòng ngủ, phòng khách, căn hộ dịch vụ
+- Chất liệu gỗ MDF/MFC, vải, da, kim loại
+- Ngân sách & combo tiết kiệm
 
-Nguyên tắc:
-- Trả lời bằng tiếng Việt, thân thiện, chuyên nghiệp
-- Tư vấn phù hợp ngân sách khách hàng
-- Gợi ý combo tiết kiệm khi có thể
-- Nếu không chắc, hãy nói rõ và đề xuất liên hệ hotline`;
+QUAN TRỌNG — Format trả lời:
+- Luôn trả về HTML hợp lệ (không dùng markdown)
+- Dùng thẻ <p> cho đoạn văn, <ul>/<li> cho danh sách, <strong> để nhấn mạnh
+- Ví dụ: <p>Phòng 12m² thì mình gợi ý...</p><ul><li><strong>Giường KARA</strong>: 6.99 triệu</li></ul>
+- Không wrap trong <html>, <body> hay <div> ngoài cùng — chỉ content thôi`;
 
 interface Message {
     role: 'user' | 'model';
@@ -22,12 +28,12 @@ interface Message {
 
 export async function chatWithAI(userMessage: string, history: Message[]): Promise<string> {
     if (!GEMINI_API_KEY) {
-        return 'Xin lỗi, tính năng AI chưa được cấu hình. Vui lòng liên hệ hotline để được tư vấn.';
+        return '<p>API chưa cấu hình. Bạn gọi hotline <strong>0123.456.789</strong> để mình tư vấn trực tiếp nha 😊</p>';
     }
 
     const contents = [
         { role: 'user', parts: [{ text: SYSTEM_PROMPT }] },
-        { role: 'model', parts: [{ text: 'Xin chào! Tôi là trợ lý MODI.vn 🏠 Tôi có thể giúp bạn tư vấn nội thất module, combo phòng ngủ, phòng khách, hoặc giải pháp cho căn hộ dịch vụ. Bạn cần tư vấn gì?' }] },
+        { role: 'model', parts: [{ text: '<p>Mình là Mia, nhân viên tư vấn của MODI 👋 Bạn đang tìm nội thất cho không gian nào — phòng ngủ, phòng khách, hay cả căn hộ?</p>' }] },
         ...history,
         { role: 'user', parts: [{ text: userMessage }] },
     ];
@@ -39,7 +45,7 @@ export async function chatWithAI(userMessage: string, history: Message[]): Promi
             body: JSON.stringify({
                 contents,
                 generationConfig: {
-                    temperature: 0.7,
+                    temperature: 0.75,
                     topP: 0.9,
                     maxOutputTokens: 1024,
                 },
@@ -48,9 +54,9 @@ export async function chatWithAI(userMessage: string, history: Message[]): Promi
 
         if (!res.ok) throw new Error(`API error: ${res.status}`);
         const data = await res.json();
-        return data.candidates?.[0]?.content?.parts?.[0]?.text || 'Không thể xử lý yêu cầu.';
+        return data.candidates?.[0]?.content?.parts?.[0]?.text || '<p>Không xử lý được, thử lại nha bạn.</p>';
     } catch (err) {
         console.error('AI Chat error:', err);
-        return 'Xin lỗi, có lỗi xảy ra. Vui lòng thử lại sau hoặc liên hệ hotline.';
+        return '<p>Lỗi kết nối rồi 😅 Bạn thử lại sau hoặc nhắn Zalo <strong>0123.456.789</strong> để mình hỗ trợ nha.</p>';
     }
 }
