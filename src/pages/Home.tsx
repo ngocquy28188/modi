@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowRight, ChevronDown, Star, ShoppingCart, Check,
-  Crown, Truck, Shield, Headphones, Bed, Sofa, Building2,
-  Lightbulb, Package, Quote, Zap,
+  Crown, Truck, Shield, Headphones,
+  Package, Quote, Zap,
 } from 'lucide-react';
 import { pb, Collections } from '@/lib/pocketbase';
 import {
