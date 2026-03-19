@@ -1,53 +1,161 @@
-import { Clock, Search } from 'lucide-react';
-import { formatPrice } from '@/types/furniture';
-import StatusBadge from '@/components/StatusBadge';
+import { useState, useEffect } from 'react';
+import { ShoppingBag, ChevronDown } from 'lucide-react';
+import { pb, Collections } from '@/lib/pocketbase';
+import { OrderStatusLabels, formatPrice } from '@/types/furniture';
 import type { OrderStatus } from '@/types/furniture';
 
-interface OrderRow { id: string; customer: string; date: string; total: number; status: OrderStatus; items: string; }
+interface Order {
+    id: string;
+    customerName: string;
+    phone: string;
+    email?: string;
+    shippingAddress: string;
+    items: any[];
+    totalAmount: number;
+    shippingFee?: number;
+    status: OrderStatus;
+    paymentMethod: string;
+    notes?: string;
+    created: string;
+}
 
-const MOCK: OrderRow[] = [
-    { id: 'ORD-047', customer: 'Nguyễn Minh Anh', date: '2026-03-18', total: 24900000, status: 'CONFIRMED', items: 'Combo Phòng Ngủ SAKURA' },
-    { id: 'ORD-046', customer: 'Trần Văn Bình', date: '2026-03-17', total: 14900000, status: 'PRODUCING', items: 'Sofa Module LUNA' },
-    { id: 'ORD-045', customer: 'Lê Thị Cẩm', date: '2026-03-16', total: 13980000, status: 'SHIPPING', items: 'Giường KARA × 2' },
-    { id: 'ORD-044', customer: 'Phạm Đức Dũng', date: '2026-03-15', total: 49900000, status: 'DELIVERED', items: 'Combo Studio URBAN' },
-];
+const STATUS_COLORS: Record<OrderStatus, string> = {
+    PENDING: 'bg-amber-50 text-amber-700',
+    CONFIRMED: 'bg-blue-50 text-blue-700',
+    PRODUCING: 'bg-purple-50 text-purple-700',
+    SHIPPING: 'bg-cyan-50 text-cyan-700',
+    DELIVERED: 'bg-emerald-50 text-emerald-700',
+    CANCELLED: 'bg-red-50 text-red-600',
+};
+
+const STATUS_FLOW: OrderStatus[] = ['PENDING', 'CONFIRMED', 'PRODUCING', 'SHIPPING', 'DELIVERED'];
 
 export default function AdminOrders() {
+    const [orders, setOrders] = useState<Order[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [expanded, setExpanded] = useState<string | null>(null);
+
+    async function load() {
+        setLoading(true);
+        try {
+            const res = await pb.collection(Collections.ORDERS).getList(1, 200, { sort: '-created' });
+            setOrders(res.items as unknown as Order[]);
+        } catch (e) { console.error(e); }
+        setLoading(false);
+    }
+
+    useEffect(() => { load(); }, []);
+
+    async function updateStatus(id: string, status: OrderStatus) {
+        try {
+            await pb.collection(Collections.ORDERS).update(id, { status });
+            setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
+        } catch (e: any) { alert(e.message); }
+    }
+
     return (
         <div>
-            <h1 className="text-display text-2xl font-bold text-slate-900 mb-6">Đơn hàng</h1>
-
-            <div className="mb-4 flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2">
-                <Search className="h-4 w-4 text-slate-400" />
-                <input type="text" placeholder="Tìm đơn hàng..." className="flex-1 bg-transparent text-sm outline-none" />
+            <div className="mb-6 flex items-center justify-between">
+                <h1 style={{ fontFamily: 'var(--font-display)' }} className="text-2xl font-bold text-[#1a1612]">
+                    Đơn hàng <span className="text-base font-normal text-[#a09080]">({orders.length})</span>
+                </h1>
+                <div className="flex gap-2">
+                    {STATUS_FLOW.map(s => (
+                        <span key={s} className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${STATUS_COLORS[s]}`}>
+                            {orders.filter(o => o.status === s).length} {OrderStatusLabels[s]}
+                        </span>
+                    ))}
+                </div>
             </div>
 
-            <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white">
-                <table className="w-full text-sm">
-                    <thead className="border-b border-slate-100 bg-slate-50">
-                        <tr>
-                            <th className="px-4 py-3 text-left font-medium text-slate-500">Mã đơn</th>
-                            <th className="px-4 py-3 text-left font-medium text-slate-500">Khách hàng</th>
-                            <th className="px-4 py-3 text-left font-medium text-slate-500">Sản phẩm</th>
-                            <th className="px-4 py-3 text-right font-medium text-slate-500">Tổng tiền</th>
-                            <th className="px-4 py-3 text-center font-medium text-slate-500">Trạng thái</th>
-                            <th className="px-4 py-3 text-right font-medium text-slate-500">Ngày</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {MOCK.map(o => (
-                            <tr key={o.id} className="border-b border-slate-50 hover:bg-slate-50">
-                                <td className="px-4 py-3 font-medium text-slate-900">{o.id}</td>
-                                <td className="px-4 py-3 text-slate-600">{o.customer}</td>
-                                <td className="px-4 py-3 text-slate-500">{o.items}</td>
-                                <td className="px-4 py-3 text-right font-medium text-gold-600">{formatPrice(o.total)}</td>
-                                <td className="px-4 py-3 text-center"><StatusBadge status={o.status} /></td>
-                                <td className="px-4 py-3 text-right text-slate-400 flex items-center justify-end gap-1"><Clock className="h-3 w-3" />{new Date(o.date).toLocaleDateString('vi-VN')}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+            {loading ? (
+                <div className="py-16 text-center text-sm text-[#a09080]">Đang tải...</div>
+            ) : orders.length === 0 ? (
+                <div className="rounded-2xl border border-[#E8D9C4] bg-white p-16 text-center">
+                    <ShoppingBag className="mx-auto mb-3 h-10 w-10 text-[#c4b09a]" />
+                    <p className="text-sm text-[#8a7a68]">Chưa có đơn hàng nào</p>
+                </div>
+            ) : (
+                <div className="space-y-3">
+                    {orders.map(order => (
+                        <div key={order.id} className="rounded-2xl border border-[#E8D9C4] bg-white overflow-hidden">
+                            {/* Row */}
+                            <div
+                                className="flex items-center gap-4 px-5 py-4 cursor-pointer hover:bg-[#FAFAF7] transition-colors"
+                                onClick={() => setExpanded(expanded === order.id ? null : order.id)}>
+                                <ChevronDown className={`h-4 w-4 text-[#a09080] flex-shrink-0 transition-transform ${expanded === order.id ? 'rotate-180' : ''}`} />
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2">
+                                        <span className="font-semibold text-[#1a1612] text-sm">{order.customerName}</span>
+                                        <span className="text-xs text-[#a09080]">{order.phone}</span>
+                                    </div>
+                                    <div className="text-xs text-[#a09080] truncate">{order.shippingAddress}</div>
+                                </div>
+                                <div className="text-right flex-shrink-0">
+                                    <div style={{ fontFamily: 'var(--font-display)' }} className="font-semibold text-[#1a1612]">
+                                        {formatPrice(order.totalAmount)}
+                                    </div>
+                                    <div className="text-xs text-[#a09080]">{new Date(order.created).toLocaleDateString('vi-VN')}</div>
+                                </div>
+                                <span className={`flex-shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${STATUS_COLORS[order.status]}`}>
+                                    {OrderStatusLabels[order.status]}
+                                </span>
+                            </div>
+
+                            {/* Expanded detail */}
+                            {expanded === order.id && (
+                                <div className="border-t border-[#f0e8dc] px-5 py-4 bg-[#FAFAF7]">
+                                    {/* Items */}
+                                    {Array.isArray(order.items) && order.items.length > 0 && (
+                                        <div className="mb-4">
+                                            <div className="text-xs font-semibold text-[#6b5a44] uppercase tracking-wider mb-2">Sản phẩm</div>
+                                            <div className="space-y-1.5">
+                                                {order.items.map((item: any, i: number) => (
+                                                    <div key={i} className="flex justify-between text-sm">
+                                                        <span className="text-[#5c5448]">{item.name || item.productId} × {item.quantity}</span>
+                                                        <span className="font-medium text-[#1a1612]">{formatPrice(item.unitPrice * item.quantity)}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {order.notes && (
+                                        <div className="mb-4 text-xs text-[#6b5a44] bg-amber-50 rounded-lg px-3 py-2">
+                                            📝 {order.notes}
+                                        </div>
+                                    )}
+
+                                    {/* Status update */}
+                                    <div>
+                                        <div className="text-xs font-semibold text-[#6b5a44] uppercase tracking-wider mb-2">Cập nhật trạng thái</div>
+                                        <div className="flex flex-wrap gap-2">
+                                            {STATUS_FLOW.map(s => (
+                                                <button key={s}
+                                                    onClick={() => updateStatus(order.id, s)}
+                                                    className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all border ${order.status === s
+                                                        ? 'border-[#C49B3D] bg-[#C49B3D] text-white'
+                                                        : 'border-[#E8D9C4] text-[#6b5a44] hover:border-[#C49B3D] hover:text-[#C49B3D]'
+                                                        }`}>
+                                                    {OrderStatusLabels[s]}
+                                                </button>
+                                            ))}
+                                            <button
+                                                onClick={() => updateStatus(order.id, 'CANCELLED')}
+                                                className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all border ${order.status === 'CANCELLED'
+                                                    ? 'border-red-400 bg-red-50 text-red-600'
+                                                    : 'border-[#E8D9C4] text-[#a09080] hover:border-red-300 hover:text-red-500'
+                                                    }`}>
+                                                Hủy đơn
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }
