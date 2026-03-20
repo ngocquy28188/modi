@@ -55,13 +55,13 @@ export default function AdminOrders() {
 
     return (
         <div>
-            <div className="mb-6 flex items-center justify-between">
-                <h1 style={{ fontFamily: 'var(--font-display)' }} className="text-2xl font-bold text-[#1a1612]">
+            <div className="mb-4 flex flex-wrap items-center gap-3">
+                <h1 style={{ fontFamily: 'var(--font-display)' }} className="text-xl md:text-2xl font-bold text-[#1a1612]">
                     Đơn hàng <span className="text-base font-normal text-[#a09080]">({orders.length})</span>
                 </h1>
-                <div className="flex gap-2">
+                <div className="flex gap-1.5 overflow-x-auto flex-1 min-w-0">
                     {STATUS_FLOW.map(s => (
-                        <span key={s} className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${STATUS_COLORS[s]}`}>
+                        <span key={s} className={`rounded-full px-2 py-1 text-[10px] md:text-[11px] font-semibold whitespace-nowrap ${STATUS_COLORS[s]}`}>
                             {orders.filter(o => o.status === s).length} {OrderStatusLabels[s]}
                         </span>
                     ))}
@@ -80,24 +80,23 @@ export default function AdminOrders() {
                     {orders.map(order => (
                         <div key={order.id} className="rounded-2xl border border-[#E8D9C4] bg-white overflow-hidden">
                             {/* Row */}
-                            <div
-                                className="flex items-center gap-4 px-5 py-4 cursor-pointer hover:bg-[#FAFAF7] transition-colors"
+                            <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 sm:gap-4 px-4 sm:px-5 py-3 sm:py-4 cursor-pointer hover:bg-[#FAFAF7] transition-colors"
                                 onClick={() => setExpanded(expanded === order.id ? null : order.id)}>
                                 <ChevronDown className={`h-4 w-4 text-[#a09080] flex-shrink-0 transition-transform ${expanded === order.id ? 'rotate-180' : ''}`} />
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2">
                                         <span className="font-semibold text-[#1a1612] text-sm">{order.customerName}</span>
-                                        <span className="text-xs text-[#a09080]">{order.phone}</span>
+                                        <span className="text-xs text-[#a09080] hidden sm:inline">{order.phone}</span>
                                     </div>
                                     <div className="text-xs text-[#a09080] truncate">{order.shippingAddress}</div>
                                 </div>
                                 <div className="text-right flex-shrink-0">
-                                    <div style={{ fontFamily: 'var(--font-display)' }} className="font-semibold text-[#1a1612]">
+                                    <div style={{ fontFamily: 'var(--font-display)' }} className="font-semibold text-[#1a1612] text-sm">
                                         {formatPrice(order.totalAmount)}
                                     </div>
                                     <div className="text-xs text-[#a09080]">{new Date(order.created).toLocaleDateString('vi-VN')}</div>
                                 </div>
-                                <span className={`flex-shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${STATUS_COLORS[order.status]}`}>
+                                <span className={`flex-shrink-0 rounded-full px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold ${STATUS_COLORS[order.status]}`}>
                                     {OrderStatusLabels[order.status]}
                                 </span>
                             </div>

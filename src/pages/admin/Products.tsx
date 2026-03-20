@@ -103,14 +103,14 @@ export default function AdminProducts() {
 
     return (
         <div>
-            <div className="mb-6 flex items-center justify-between">
-                <h1 style={{ fontFamily: 'var(--font-display)' }} className="text-2xl font-bold text-[#1a1612]">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                <h1 style={{ fontFamily: 'var(--font-display)' }} className="text-xl md:text-2xl font-bold text-[#1a1612]">
                     Sản phẩm <span className="text-base font-normal text-[#a09080]">({products.length})</span>
                 </h1>
                 <button onClick={openAdd}
                     className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition-all hover:opacity-90"
                     style={{ background: 'linear-gradient(135deg,#C49B3D,#8B6D20)' }}>
-                    <Plus className="h-4 w-4" /> Thêm sản phẩm
+                    <Plus className="h-4 w-4" /> Thêm
                 </button>
             </div>
 
@@ -126,61 +126,62 @@ export default function AdminProducts() {
                 {loading ? (
                     <div className="py-16 text-center text-sm text-[#a09080]">Đang tải...</div>
                 ) : (
-                    <table className="w-full text-sm">
-                        <thead className="border-b border-[#f0e8dc] bg-[#FAFAF7]">
-                            <tr>
-                                <th className="px-4 py-3 text-left font-semibold text-[#6b5a44]">Sản phẩm</th>
-                                <th className="px-4 py-3 text-left font-semibold text-[#6b5a44]">Danh mục</th>
-                                <th className="px-4 py-3 text-right font-semibold text-[#6b5a44]">Giá</th>
-                                <th className="px-4 py-3 text-center font-semibold text-[#6b5a44]">Trạng thái</th>
-                                <th className="px-4 py-3 text-center font-semibold text-[#6b5a44]">Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filtered.map(p => (
-                                <tr key={p.id} className="border-b border-[#f9f4ee] hover:bg-[#FAFAF7] transition-colors">
-                                    <td className="px-4 py-3">
-                                        <div className="flex items-center gap-3">
-                                            {/* Thumbnail or placeholder */}
-                                            {p.images?.length > 0 ? (
-                                                <img src={pb.files.getURL(p as any, p.images[0], { thumb: '60x60' })}
-                                                    className="h-9 w-9 rounded-lg object-cover border border-[#E8D9C4]" alt="" />
-                                            ) : (
-                                                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#FDF6E8]">
-                                                    <Package className="h-4 w-4 text-[#C49B3D]" />
-                                                </div>
-                                            )}
-                                            <div>
-                                                <div className="font-semibold text-[#1a1612]">{p.name}</div>
-                                                <div className="text-xs text-[#a09080]">{p.sku}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-4 py-3 text-[#6b5a44]">{ProductCategoryLabels[p.category]}</td>
-                                    <td className="px-4 py-3 text-right">
-                                        <div className="font-semibold text-[#1a1612]">{formatPrice(p.salePrice || p.price)}</div>
-                                        {p.salePrice && <div className="text-xs text-[#a09080] line-through">{formatPrice(p.price)}</div>}
-                                    </td>
-                                    <td className="px-4 py-3 text-center"><StatusBadge status={p.status} /></td>
-                                    <td className="px-4 py-3">
-                                        <div className="flex items-center justify-center gap-2">
-                                            <button onClick={() => openEdit(p)}
-                                                className="rounded-lg p-1.5 text-[#a09080] hover:bg-[#FDF6E8] hover:text-[#C49B3D] transition-colors">
-                                                <Pencil className="h-4 w-4" />
-                                            </button>
-                                            <button onClick={() => handleDelete(p.id)} disabled={deleting === p.id}
-                                                className="rounded-lg p-1.5 text-[#a09080] hover:bg-red-50 hover:text-red-500 transition-colors">
-                                                <Trash2 className="h-4 w-4" />
-                                            </button>
-                                        </div>
-                                    </td>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm min-w-[540px]">
+                            <thead className="border-b border-[#f0e8dc] bg-[#FAFAF7]">
+                                <tr>
+                                    <th className="px-4 py-3 text-left font-semibold text-[#6b5a44]">Sản phẩm</th>
+                                    <th className="px-4 py-3 text-left font-semibold text-[#6b5a44] hidden sm:table-cell">Danh mục</th>
+                                    <th className="px-4 py-3 text-right font-semibold text-[#6b5a44]">Giá</th>
+                                    <th className="px-4 py-3 text-center font-semibold text-[#6b5a44] hidden md:table-cell">Trạng thái</th>
+                                    <th className="px-4 py-3 text-center font-semibold text-[#6b5a44]">Thao tác</th>
                                 </tr>
-                            ))}
-                            {filtered.length === 0 && (
-                                <tr><td colSpan={5} className="py-12 text-center text-sm text-[#a09080]">Không tìm thấy sản phẩm</td></tr>
-                            )}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {filtered.map(p => (
+                                    <tr key={p.id} className="border-b border-[#f9f4ee] hover:bg-[#FAFAF7] transition-colors">
+                                        <td className="px-4 py-3">
+                                            <div className="flex items-center gap-3">
+                                                {p.images?.length > 0 ? (
+                                                    <img src={pb.files.getURL(p as any, p.images[0], { thumb: '60x60' })}
+                                                        className="h-9 w-9 rounded-lg object-cover border border-[#E8D9C4]" alt="" />
+                                                ) : (
+                                                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#FDF6E8]">
+                                                        <Package className="h-4 w-4 text-[#C49B3D]" />
+                                                    </div>
+                                                )}
+                                                <div>
+                                                    <div className="font-semibold text-[#1a1612] text-xs sm:text-sm">{p.name}</div>
+                                                    <div className="text-xs text-[#a09080]">{p.sku}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-4 py-3 text-[#6b5a44] hidden sm:table-cell">{ProductCategoryLabels[p.category]}</td>
+                                        <td className="px-4 py-3 text-right">
+                                            <div className="font-semibold text-[#1a1612]">{formatPrice(p.salePrice || p.price)}</div>
+                                            {p.salePrice && <div className="text-xs text-[#a09080] line-through">{formatPrice(p.price)}</div>}
+                                        </td>
+                                        <td className="px-4 py-3 text-center hidden md:table-cell"><StatusBadge status={p.status} /></td>
+                                        <td className="px-4 py-3">
+                                            <div className="flex items-center justify-center gap-2">
+                                                <button onClick={() => openEdit(p)}
+                                                    className="rounded-lg p-1.5 text-[#a09080] hover:bg-[#FDF6E8] hover:text-[#C49B3D] transition-colors">
+                                                    <Pencil className="h-4 w-4" />
+                                                </button>
+                                                <button onClick={() => handleDelete(p.id)} disabled={deleting === p.id}
+                                                    className="rounded-lg p-1.5 text-[#a09080] hover:bg-red-50 hover:text-red-500 transition-colors">
+                                                    <Trash2 className="h-4 w-4" />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {filtered.length === 0 && (
+                                    <tr><td colSpan={5} className="py-12 text-center text-sm text-[#a09080]">Không tìm thấy sản phẩm</td></tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 )}
             </div>
 
