@@ -1,20 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Trash2, Plus, Minus, ShoppingCart, ArrowLeft, Crown, CheckCircle, Phone, MapPin, User } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { formatPrice } from '@/types/furniture';
 import { pb, Collections } from '@/lib/pocketbase';
-
-const MOCK_PRICES: Record<string, { name: string; price: number }> = {
-    p1: { name: 'Giường Ngủ Module KARA', price: 6990000 },
-    p2: { name: 'Tủ Quần Áo MIKA 3 Cánh', price: 9990000 },
-    p3: { name: 'Sofa Module LUNA L-Shape', price: 14900000 },
-    p4: { name: 'Kệ TV Module ZENITH', price: 5900000 },
-    p5: { name: 'Combo Phòng Ngủ SAKURA', price: 24900000 },
-    p6: { name: 'Bàn Làm Việc Thông Minh FLEXI', price: 5990000 },
-    p7: { name: 'Combo Căn Hộ Studio URBAN', price: 49900000 },
-    p8: { name: 'Giá Sách Module HEXA', price: 890000 },
-};
 
 export default function Cart() {
     const { items, updateQuantity, removeFromCart, clearCart } = useCart();
@@ -22,9 +11,24 @@ export default function Cart() {
     const [form, setForm] = useState({ name: '', phone: '', email: '', address: '', notes: '', payment: 'COD' });
     const [placing, setPlacing] = useState(false);
     const [orderId, setOrderId] = useState('');
+    const [productMap, setProductMap] = useState<Record<string, { name: string; price: number }>>({});
+
+    // Fetch real product data from PocketBase
+    useEffect(() => {
+        (async () => {
+            try {
+                const all = await pb.collection(Collections.PRODUCTS).getFullList();
+                const map: Record<string, { name: string; price: number }> = {};
+                for (const p of all) {
+                    map[p.id] = { name: p.name as string, price: (p.salePrice as number) || (p.price as number) || 0 };
+                }
+                setProductMap(map);
+            } catch { /* PB unavailable, will show raw IDs */ }
+        })();
+    }, []);
 
     const cartDetails = items.map(item => {
-        const info = MOCK_PRICES[item.productId] || { name: `Sản phẩm #${item.productId}`, price: 0 };
+        const info = productMap[item.productId] || { name: `Sản phẩm #${item.productId.slice(0, 6)}`, price: 0 };
         return { ...item, name: info.name, unitPrice: info.price, total: info.price * item.quantity };
     });
 
