@@ -13,14 +13,14 @@ export default function Layout({ children }: { children: ReactNode }) {
     const [menuOpen, setMenuOpen] = useState(false);
 
     const navLinks = [
-        { to: '/', label: 'Trang chủ' },
-        { to: '/category/BEDROOM', label: 'Phòng Ngủ', icon: <Bed className="h-4 w-4" /> },
-        { to: '/category/LIVING_ROOM', label: 'Phòng Khách', icon: <Sofa className="h-4 w-4" /> },
-        { to: '/category/APARTMENT', label: 'Căn Hộ DV', icon: <Building2 className="h-4 w-4" /> },
-        { to: '/category/SMART', label: 'Smart', icon: <Lightbulb className="h-4 w-4" /> },
-        { to: '/cart', label: 'Giỏ hàng', icon: <ShoppingCart className="h-4 w-4" /> },
-        { to: '/blog', label: 'Blog', icon: <BookOpen className="h-4 w-4" /> },
-        ...(isAdmin ? [{ to: '/admin', label: 'Admin', icon: <Shield className="h-4 w-4" /> }] : []),
+        { to: '/', label: 'Trang chủ', desktop: true },
+        { to: '/category/BEDROOM', label: 'Phòng Ngủ', icon: <Bed className="h-4 w-4" />, desktop: false },
+        { to: '/category/LIVING_ROOM', label: 'Phòng Khách', icon: <Sofa className="h-4 w-4" />, desktop: false },
+        { to: '/category/APARTMENT', label: 'Căn Hộ', icon: <Building2 className="h-4 w-4" />, desktop: false },
+        { to: '/category/SMART', label: 'Smart', icon: <Lightbulb className="h-4 w-4" />, desktop: false },
+        { to: '/cart', label: 'Giỏ hàng', icon: <ShoppingCart className="h-4 w-4" />, desktop: true },
+        { to: '/blog', label: 'Blog', icon: <BookOpen className="h-4 w-4" />, desktop: true },
+        ...(isAdmin ? [{ to: '/admin', label: 'Admin', icon: <Shield className="h-4 w-4" />, desktop: true }] : []),
     ];
 
     const isActive = (path: string) => location.pathname === path || location.pathname + location.search === path;
@@ -42,7 +42,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 
                     {/* Desktop nav */}
                     <nav className="hidden items-center gap-1 md:flex">
-                        {navLinks.map((link) => (
+                        {navLinks.filter(l => l.desktop).map((link) => (
                             <Link
                                 key={link.to}
                                 to={link.to}

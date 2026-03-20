@@ -92,9 +92,9 @@ export default function Home() {
       <section style={{
         position: 'relative', display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
-        minHeight: 'calc(100vh - 64px)',
+        minHeight: 'min(calc(100vh - 64px), 600px)',
         background: 'linear-gradient(135deg,#f5ede2 0%,#faf6ef 50%,#ede8e0 100%)',
-        overflow: 'hidden', padding: '80px 24px 60px',
+        overflow: 'hidden', padding: '60px 16px 40px',
       }}>
         {/* Grid texture */}
         <div style={{
@@ -103,8 +103,8 @@ export default function Home() {
           backgroundSize: '60px 60px',
         }} />
         {/* Decorative circles */}
-        <div style={{ position: 'absolute', right: '-8rem', top: '50%', transform: 'translateY(-50%)', width: 560, height: 560, borderRadius: '50%', border: `1px solid ${gold}18`, pointerEvents: 'none' }} className="hidden xl:block" />
-        <div style={{ position: 'absolute', right: '-5rem', top: '50%', transform: 'translateY(-50%)', width: 380, height: 380, borderRadius: '50%', border: `1px solid ${gold}22`, pointerEvents: 'none' }} className="hidden xl:block" />
+        <div style={{ position: 'absolute', right: '-8rem', top: '50%', transform: 'translateY(-50%)', width: 560, height: 560, borderRadius: '50%', border: `1px solid ${gold}18`, pointerEvents: 'none', display: 'none' }} className="xl:!block" />
+        <div style={{ position: 'absolute', right: '-5rem', top: '50%', transform: 'translateY(-50%)', width: 380, height: 380, borderRadius: '50%', border: `1px solid ${gold}22`, pointerEvents: 'none', display: 'none' }} className="xl:!block" />
 
         <div style={{ position: 'relative', zIndex: 10, maxWidth: 820, textAlign: 'center' }}>
           {/* Eyebrow */}
@@ -186,8 +186,8 @@ export default function Home() {
           TRUST BAR
       ═══════════════════════════════════════════════════ */}
       <section style={{ borderTop: `1px solid ${border}`, borderBottom: `1px solid ${border}`, background: 'white' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4,1fr)' }}
-          className="grid-cols-2 sm:grid-cols-4">
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}
+          className="grid grid-cols-2 sm:grid-cols-4">
           {[
             { icon: '🛋️', value: products.length + '+', label: 'Sản phẩm' },
             { icon: '💰', value: '30%', label: 'Tiết kiệm khi mua combo' },
@@ -211,7 +211,7 @@ export default function Home() {
       {/* ═══════════════════════════════════════════════════
           CATEGORY SHOWCASE
       ═══════════════════════════════════════════════════ */}
-      <section style={{ padding: '80px 24px', background: cream }}>
+      <section style={{ padding: '48px 16px', background: cream }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           {/* Header */}
           <div style={{ marginBottom: 40, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
@@ -227,7 +227,7 @@ export default function Home() {
           </div>
 
           {/* 4-column grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16 }} className="grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {(['BEDROOM', 'LIVING_ROOM', 'COMBO', 'SMART'] as ProductCategory[]).map((c) => (
               <Link
                 key={c}
@@ -285,9 +285,9 @@ export default function Home() {
       {/* ═══════════════════════════════════════════════════
           WHY MODI
       ═══════════════════════════════════════════════════ */}
-      <section style={{ borderTop: `1px solid ${border}`, borderBottom: `1px solid ${border}`, background: 'white', padding: '80px 24px' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gap: 48, gridTemplateColumns: '1fr 1fr', alignItems: 'center' }}
-          className="grid-cols-1 lg:grid-cols-2">
+      <section style={{ borderTop: `1px solid ${border}`, borderBottom: `1px solid ${border}`, background: 'white', padding: '48px 16px' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', alignItems: 'center' }}
+          className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12">
           {/* Copy */}
           <div>
             <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', color: gold, textTransform: 'uppercase', marginBottom: 12 }}>Vì sao chọn MODI</p>
@@ -342,7 +342,7 @@ export default function Home() {
       {/* ═══════════════════════════════════════════════════
           PRODUCT GRID
       ═══════════════════════════════════════════════════ */}
-      <section id="products" style={{ padding: '80px 24px', background: cream }}>
+      <section id="products" style={{ padding: '48px 16px', background: cream }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           {/* Header */}
           <div style={{ marginBottom: 40, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
@@ -497,7 +497,7 @@ export default function Home() {
       {/* ═══════════════════════════════════════════════════
           COMBO CTA
       ═══════════════════════════════════════════════════ */}
-      <section style={{ position: 'relative', overflow: 'hidden', background: dark, padding: '96px 24px' }}>
+      <section style={{ position: 'relative', overflow: 'hidden', background: dark, padding: '60px 16px' }}>
         <div style={{
           position: 'absolute', inset: 0, opacity: 0.06, pointerEvents: 'none',
           backgroundImage: `radial-gradient(${gold} 1px,transparent 1px)`,
@@ -541,7 +541,7 @@ export default function Home() {
       {/* ═══════════════════════════════════════════════════
           TESTIMONIALS
       ═══════════════════════════════════════════════════ */}
-      <section style={{ padding: '80px 24px', background: cream, borderBottom: `1px solid ${border}` }}>
+      <section style={{ padding: '48px 16px', background: cream, borderBottom: `1px solid ${border}` }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
             <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', color: gold, textTransform: 'uppercase', marginBottom: 10 }}>Khách hàng nói gì</p>
@@ -572,9 +572,9 @@ export default function Home() {
       {/* ═══════════════════════════════════════════════════
           FOOTER
       ═══════════════════════════════════════════════════ */}
-      <footer style={{ background: dark, padding: '64px 24px 32px' }}>
+      <footer style={{ background: dark, padding: '48px 16px 24px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <div className="grid gap-10 sm:grid-cols-4">
+          <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             <div className="sm:col-span-2">
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
                 <div style={{ width: 32, height: 32, borderRadius: 8, background: `linear-gradient(135deg,${gold},${goldDark})`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

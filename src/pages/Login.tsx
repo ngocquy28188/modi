@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Crown, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function Login() {
-    const { login } = useAuth();
+    const { login, user, isAdmin } = useAuth();
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -18,13 +18,19 @@ export default function Login() {
         setLoading(true);
         try {
             await login(email, password);
-            navigate('/');
+            // Redirect will happen in useEffect below after state updates
         } catch (err: any) {
             setError(err.message || 'Đăng nhập thất bại');
-        } finally {
             setLoading(false);
         }
     }
+
+    // Redirect after login state settles
+    useEffect(() => {
+        if (user) {
+            navigate(isAdmin ? '/admin' : '/');
+        }
+    }, [user, isAdmin, navigate]);
 
     return (
         <div className="flex min-h-[85vh] items-center justify-center px-4">

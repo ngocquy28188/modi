@@ -30,11 +30,11 @@ function mapUser(record: RecordModel): AuthUser {
     return {
         id: record.id,
         email: record.email as string,
-        name: record.name as string,
+        name: (record.fullName as string) || (record.name as string) || '',
         phone: (record.phone as string) || '',
         role: (record.role as 'CUSTOMER' | 'ADMIN') || 'CUSTOMER',
         avatar: (record.avatar as string) || '',
-        city: (record.city as string) || '',
+        city: (record.address as string) || (record.city as string) || '',
     };
 }
 
